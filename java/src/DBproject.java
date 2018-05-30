@@ -327,13 +327,88 @@ public class DBproject{
 	}
 
 	public static void AddPilot(DBproject esql) {//2
+		try {
+                  String query2 = "INSERT INTO Pilot (id, fullname, nationality) VALUES(";
+                  System.out.print("Insert Pilot's ID: ");
+                  String pilot_ID = in.readLine();
+                  query2 +=  pilot_ID;
+                  System.out.print("Insert Pilot's fullname: ");
+                  String pilot_name = in.readLine();
+                  query2 += ", \'" + pilot_name + "\'";
+                  System.out.print("Insert the Pilot's nationality: ");
+                  String pilot_nationality = in.readLine();
+                  query2 += ", \'" + pilot_nationality + "\');\n";
+
+                  System.out.print(query2);
+                  esql.executeUpdate(query2);
+                }
+                catch (Exception e) {
+                  System.out.println("Your input is invalid!");
+                }
 	}
 
 	public static void AddFlight(DBproject esql) {//3
 		// Given a pilot, plane and flight, adds a flight in the DB
-	}
+		try {
+		  String query3 = "INSERT INTO Flight (fnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_airport, departure_airport) VALUES("; 
+ 		  System.out.print("Insert the flight's fnum: "); 
+		  String flight_fnum = in.readLine();
+		  query3 +=  flight_fnum; 
+
+		  System.out.print("Insert the flight's cost: ");
+		  String flight_cost = in.readLine();
+		  query3 += ", " + flight_cost; 
+		  
+		  System.out.print("Insert how many seats have been sold: ");
+		  String num_seats_sold = in.readLine(); 
+		  query3 += ", " + num_seats_sold;  
+		  
+		  System.out.print("Insert the number of stops that flight has: "); 
+		  String num_flight_stops = in.readLine(); 
+		  query3 += "," + num_flight_stops; 
+		  
+		  System.out.print("Insert the flight's actual departure date: ");
+		  String plane_dept_date = in.readLine(); 
+		  query3 += ", \'" + plane_dept_date + "\'";
+		  
+		  System.out.print("Insert the flight's actual arrival date: "); 
+		  String plane_arrival_date = in.readLine(); 
+		  query3 += ", \'" + plane_arrival_date + "\'"; 
+		  
+		  System.out.print("Insert the name of airport the flight will be arriving: "); 
+		  String airport_arrival = in.readLine(); 
+		  query3 += ", \'" + airport_arrival + "\'"; 
+		  
+		  System.out.print("Insert the name of airport the flight will be departing from: "); 
+		  String airport_depart = in.readLine(); 
+		  query3 += ", \'" + airport_depart + "\')\n"; 
+			
+	
+		  System.out.print(query3);
+		  esql.executeUpdate(query3); 	
+		}
+		catch (Exception e) {
+		  System.out.println("Your input is invalid!");
+		}
+
+ 	}
 
 	public static void AddTechnician(DBproject esql) {//4
+		try {
+                  String query4 = "INSERT INTO Technician (id, full_name) VALUES(";
+                  System.out.print("Insert Technician's ID: ");
+                  String tech_ID = in.readLine();
+                  query4 +=  tech_ID;
+                  System.out.print("Insert Technician's fullname: ");
+                  String tech_name = in.readLine();
+                  query4 += ", \'" + tech_name + "\');\n";
+
+                  System.out.print(query4);
+                  esql.executeUpdate(query4);
+                }
+                catch (Exception e) {
+                  System.out.println("Your input is invalid!");
+                }
 	}
 
 	public static void BookFlight(DBproject esql) {//5
