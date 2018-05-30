@@ -301,10 +301,10 @@ public class DBproject{
 
 	public static void AddPlane(DBproject esql) {//1
 		try {
-		  String query = "INSERT INTO Plane VALUES("; 
+		  String query = "INSERT INTO Plane (id, make, model, age, seats) VALUES("; 
  		  System.out.print("Insert the plane's ID: "); 
 		  String plane_ID = in.readLine();
-		  query += "\'" + plane_ID + "\'"; 
+		  query +=  plane_ID; 
 		  System.out.print("Insert the Plane's make: ");
 		  String plane_make = in.readLine();
 		  query += ", \'" + plane_make + "\'"; 
@@ -313,12 +313,13 @@ public class DBproject{
 		  query += ", \'" + plane_model + "\'";  
 		  System.out.print("Insert the Plane's age: "); 
 		  String plane_age = in.readLine(); 
-		  query += ", \'" + plane_age + "\'"; 
+		  query += "," + plane_age; 
 		  System.out.print("Insert how many seats the Plane contains: ");
 		  String plane_seats = in.readLine(); 
-		  query += ", \'" + plane_seats + "\')";
+		  query += "," + plane_seats + ")\n";
 	
-		  System.out.print(query); 	
+		  System.out.print(query);
+		  esql.executeUpdate(query); 	
 		}
 		catch (Exception e) {
 		  System.out.println("Your input is invalid!");
