@@ -1,0 +1,10 @@
+How to compile run: 
+
+cd postgresql 
+source ./startPostgresql 
+source ./createPostgresql 
+
+cd java 
+source ./compile.sh 
+source ./run.sh [name of database] [port_number] [userID] 
+example: source ./run.sh avald026_DB 1028 avald026

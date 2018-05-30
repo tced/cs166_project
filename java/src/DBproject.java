@@ -300,6 +300,12 @@ public class DBproject{
 	}//end readChoice
 
 	public static void AddPlane(DBproject esql) {//1
+		//try {
+ 		  //String query1 = "SELECT "
+		//}
+		//catch(Exception e) {
+		  //System.err.println(e.getMessage()); 
+		//}
 	}
 
 	public static void AddPilot(DBproject esql) {//2
