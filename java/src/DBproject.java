@@ -300,12 +300,29 @@ public class DBproject{
 	}//end readChoice
 
 	public static void AddPlane(DBproject esql) {//1
-		//try {
- 		  //String query1 = "SELECT "
-		//}
-		//catch(Exception e) {
-		  //System.err.println(e.getMessage()); 
-		//}
+		try {
+		  String query = "INSERT INTO Plane VALUES("; 
+ 		  System.out.print("Insert the plane's ID: "); 
+		  String plane_ID = in.readLine();
+		  query += "\'" + plane_ID + "\'"; 
+		  System.out.print("Insert the Plane's make: ");
+		  String plane_make = in.readLine();
+		  query += ", \'" + plane_make + "\'"; 
+		  System.out.print("Insert the Plane's model: ");
+		  String plane_model = in.readLine(); 
+		  query += ", \'" + plane_model + "\'";  
+		  System.out.print("Insert the Plane's age: "); 
+		  String plane_age = in.readLine(); 
+		  query += ", \'" + plane_age + "\'"; 
+		  System.out.print("Insert how many seats the Plane contains: ");
+		  String plane_seats = in.readLine(); 
+		  query += ", \'" + plane_seats + "\')";
+	
+		  System.out.print(query); 	
+		}
+		catch (Exception e) {
+		  System.out.println("Your input is invalid!");
+		}
 	}
 
 	public static void AddPilot(DBproject esql) {//2
