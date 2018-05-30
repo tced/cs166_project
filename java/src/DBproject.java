@@ -413,10 +413,27 @@ public class DBproject{
 
 	public static void BookFlight(DBproject esql) {//5
 		// Given a customer and a flight that he/she wants to book, add a reservation to the DB
+		try {
+		  String query5 = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES("; 
+		  System.out.print("Enter customer's id: ")
+		  String customer_id = in.readLine(); 
+		  System.out.print("Enter flight's id that the customer wants to book: ");
+		  String flight_id = in.readLine(); 
+
+		//if (flight.num_sold == seats) {
+		//   make customer's status as waitlisted.
+		//   if not make it a reservation  
+		// }
+		
+		} 
+		catch (Exception e) {
+		  System.out.println("Your input is invalid!\n"); 
+		} 
 	}
 
 	public static void ListNumberOfAvailableSeats(DBproject esql) {//6
 		// For flight number and date, find the number of availalbe seats (i.e. total plane capacity minus booked seats )
+
 	}
 
 	public static void ListsTotalNumberOfRepairsPerPlane(DBproject esql) {//7
