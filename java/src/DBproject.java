@@ -418,7 +418,7 @@ public class DBproject{
                   esql.executeUpdate(query2);
                 }
                 catch (Exception e) {
-                  System.out.println("Your input is invalid!");
+                  System.err.println(e.getMessage());
                 }
 	}
 
@@ -520,7 +520,7 @@ public class DBproject{
 		  esql.executeUpdate(query3); 	
 		}
 		catch (Exception e) {
-		  System.out.println("Your input is invalid!");
+		  System.err.println(e.getMessage());
 		}
 
  	}
@@ -554,7 +554,7 @@ public class DBproject{
                   esql.executeUpdate(query4);
                 }
                 catch (Exception e) {
-                  System.out.println("Your input is invalid!");
+                  System.err.println(e.getMessage());
                 }
 	}
 
@@ -574,54 +574,49 @@ public class DBproject{
 		
 		} 
 		catch (Exception e) {
-		  System.out.println("Your input is invalid!\n"); 
+		 System.err.println(e.getMessage()); 
 		} 
 	}
 
 	public static void ListNumberOfAvailableSeats(DBproject esql) {//6
 		// For flight number and date, find the number of availalbe seats (i.e. total plane capacity minus booked seats )
+		String flight_num, dept_date = ""; 
 		try {
 		
-	           //tested and OK 
-		   String query6 = "SELECT num_sold FROM Flight WHERE fnum = "; 
-		   System.out.print("Enter flight num: "); 
-		   String flight_num = in.readLine();
-                   query6 += flight_num + " AND ";  
-		   System.out.print("Enter departure_date: "); 
-   		   String dept_date = in.readLine(); 
- 		   query6 += "actual_departure_date = \'" + dept_date + "\'"; 
- 		   
-		   System.out.println(query6);
-		   esql.executeQueryAndPrintResult(query6); 
-		   //int num_seats_sold = esql.getCurrSeqVal(query6);
-		   //System.out.print("number of seats available: " + num_seats_sold + "\n ");   
-		   /*
-		   String find_plane_id = "\nSELECT plane_id FROM FlightINFO WHERE flight_id = "; 
-		   find_plane_id += flight_num;
-		   System.out.println(find_plane_id);  
-		   int plane_id  = esql.executeQueryAndPrintResult(find_plane_id);  
-		   System.out.print("\nthis is the plane's id: " + plane_id); 
-
-		   String find_plane_seats = "\n SELECT seats FROM Plane WHERE id = " + plane_id;
-		   int num_plane_seats = esql.executeQueryAndPrintResult(find_plane_seats);
-		   System.out.print("\nthis is the number of plane seats : " + num_plane_seats); 
-
-
-		   int available_seats_left = num_plane_seats - num_seats_sold; 
-		   System.out.print("\n number of seats available for flight : " + available_seats_left); 
-		   */ 
-		  
-		   String find_seats = "SELECT (Plane.seats - Flight.num_sold) AS SeatsAvailable FROM Flight " + 
-  		   "INNER JOIN Schedule ON Schedule.flightNum = Flight.fnum " + 
-		   "INNER JOIN FlightInfo fi ON fi.flight_id = Flight.fnum" + 
-		   "INNER JOIN Plane ON Plane.id = fi.plane_id " + 
-                   "WHERE FLight.fnum = " + flight_num + " AND Schedule.dept_date = '" + dept_date + "';";  
-		
-		   int rowCount = esql.executeQueryAndPrintResult(find_seats);
-		   System.out.println ("total row(s): " + rowCount);  
+		   //do while loop to find flight number 
+                   do{
+                   	System.out.print("Enter flight num: "); 
+		   	flight_num = in.readLine();
+			if (flight_num.length() == 0) {
+			   System.out.print("Error, you did not enter a flight number. Please try again\n"); 
+			   flag = false; 
+			}
+			else {flag = true;}
+                   }while(!flag); 
+	           
+		   //do-while loop to find departure date 
+		   do {
+			System.out.print("Enter departure_date in the form YYYY-MM-DD: "); 
+   		   	dept_date = in.readLine();
+		        if (dept_date.length() == 0) {
+			   System.out.print("Error, you did not enter a departure date. Please try again\n"); 
+			   flag = false; 
+			}
+			else {flag = true;}
+		   }while(!flag);   
+		    
+		   
+		   String find_available_seats = "SELECT (p.seats - f.num_sold) AS Seats_Available FROM Flight f INNER JOIN Schedule s ON s.flightNum = f.fnum INNER JOIN FlightInfo FI on FI.flight_id = f.fnum INNER JOIN Plane p ON p.id = FI.plane_id WHERE f.fnum = " + flight_num + " AND f.actual_departure_date = '" + dept_date + "'";                   
+		   //int rowCount = esql.executeQueryAndPrintResult(find_seats);
+		   //System.out.println ("total row(s): " + rowCount);  
+	          
+		   //System.out.println(find_available_seats); 
+		   System.out.print("\n--------\nNumber of seats available for flight number " + flight_num + "\n"); 
+		   esql.executeQueryAndPrintResult(find_available_seats); 
+	           System.out.print("\n---------\n"); 
 		}
 		catch (Exception e) {
-		 System.out.println("Your input is invalid!\n"); 
+		 System.err.println(e.getMessage()); 
 		}
 	}
 
@@ -631,7 +626,7 @@ public class DBproject{
 		  String query7; 
 		}
 		catch (Exception e) {
-		 System.out.println("Your input is invalid!\n"); 
+		 System.err.println(e.getMessage()); 
 		}	
 	}
 
@@ -641,7 +636,7 @@ public class DBproject{
 		  String query8; 
 		}
 		catch (Exception e) {
-		 System.out.println("Your input is invalid!\n"); 
+		 System.err.println(e.getMessage()); 
 		}
 	}
 	
@@ -651,7 +646,7 @@ public class DBproject{
 		  String query9; 
 		}
 		catch (Exception e) {
-		 System.out.println("Your input is invalid!\n"); 
+		 System.err.println(e.getMessage()); 
 		}
 	}
 }
