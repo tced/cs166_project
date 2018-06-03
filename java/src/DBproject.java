@@ -561,16 +561,70 @@ public class DBproject{
 	public static void BookFlight(DBproject esql) {//5
 		// Given a customer and a flight that he/she wants to book, add a reservation to the DB
 		try {
-		  String query5 = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES("; 
-		  System.out.print("Enter customer's id: ");
-		  String customer_id = in.readLine(); 
-		  System.out.print("Enter flight's id that the customer wants to book: ");
-		  String flight_id = in.readLine(); 
+			System.out.print("Enter the Flight number you would like to book a reservation for: ");
+			String flight = in.readLine();
+			String check = "SELECT  (SELECT plane.seats FROM FlightInfo Info,Plane plane WHERE Info.plane_id = plane.id AND Info.flight_id = " + flight + ") - (SELECT flight.num_sold FROM Flight flight WHERE flight.fnum = " + flight + ") AS remainin_seats;\n";
+			
+			List<List<String>>  result = esql.executeQueryAndReturnResult(check);
+			int available_seats = Integer.parseInt((result.get(0)).get(0));
+			//esql.executeUpdate("DROP TRIGGER IF EXISTS seq ON Reservation;");
+			//esql.executeUpdate("CREATE OR REPLACE FUNCTION my_seq() RETURNS trigger AS $rnum$ BEGIN IF NOT EXISTS ( SELECT 0 FROM pg_class WHERE relname = \'rnum_seq\') THEN CREATE SEQUENCE rnum_seq START WITH 10000; ELSE new.rnum = nextval(\'rnum_seq\'); END IF; RETURN new; END; $rnum$ LANGUAGE \'plpgsql\'; CREATE TRIGGER seq BEFORE INSERT ON Reservation FOR EACH ROW EXECUTE PROCEDURE my_seq();");
 
-		//if (flight.num_sold == seats) {
-		//   make customer's status as waitlisted.
-		//   if not make it a reservation  
-		// }
+			System.out.print(available_seats);
+			System.out.print("\n");
+			esql.executeUpdate("DROP SEQUENCE IF EXISTS rnum_seq; CREATE SEQUENCE rnum_seq START WITH 10000;");
+
+			//if no more seats available prompt if customer would like to be added to the waitlist 
+			if (available_seats == 0) {
+				System.out.print("There are no more seats available for flight " + flight + ". Do you want to be addded to the waitlist?(Yes | No)\n");
+				String  answer = in.readLine();
+				do {
+					//if customer does not want to be added to the waitlist, go back to main menu
+					if (answer.equalsIgnoreCase( "no" )) {
+						break;
+					}
+					//if customer wants to be added to the waitlist, prompt for information
+					else if (answer.equalsIgnoreCase("yes")) {
+					System.out.print("Please enter the customer's id: ");
+					/////add//////
+					flag = true;
+					}
+					else {
+						System.out.print("Invalid input. Please try again. Enter Yes or No\n");
+						answer = in.readLine();
+						flag = false;		
+					}
+				} while(!flag);
+			}
+			//if there are seats available, get customer's information and add to reservation and customer table
+			else {
+				System.out.print("There are seats available for flight " + flight + ".Please enter the customer's id:\n");
+				String cID = in.readLine();
+				System.out.print("Please enter the customer's first name:\n");
+				String fname = in.readLine();
+				System.out.print("Please enter the customer's last name:\n");
+				String lname = in.readLine();
+				System.out.print("Please enter the customer's gender:\n");
+                                String gtype = in.readLine();
+				System.out.print("Please enter the customer's date of birth ():\n");
+                                String dob = in.readLine();
+				System.out.print("Please enter the customer's address:\n");
+                                String address = in.readLine();
+				System.out.print("Please enter the customer's phone:\n");
+                                String phone = in.readLine();
+				System.out.print("Please enter the customer's zipcode:\n");
+                                String zipcode = in.readLine();
+				int rowCount = esql.executeQuery("SELECT nextval(\'rnum_seq\');");
+				int r_number = esql.getCurrSeqVal("rnum_seq"); 
+				//System.out.print(r_number);
+				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ", R);\n" ;
+				String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", " + fname + ", " + lname + ", " + gtype + ", " + dob + ", " + address + ", " + phone + ", " + zipcode + ");\n"; 
+				System.out.print(queryR);
+				System.out.print(queryC);
+				//executeUpdate(queryR);
+				//executeUpdate(queryC);
+				//----------------update num_sold in Flight table----------
+			}
 		
 		} 
 		catch (Exception e) {
