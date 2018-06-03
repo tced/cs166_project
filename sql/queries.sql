@@ -29,13 +29,18 @@
 --WHERE Info.plane_id = plane.id AND Info.flight_id = 12) - (SELECT flight.num_sold
 --FROM Flight flight
 --WHERE flight.fnum = 12) AS remainin_seats;
+
+--INSERT INTO Customer VALUES (250, 'andrea', 'cruz', 'F', '1993-05-10', '8961 satinwood', 9092021122, 92335); 
+--SELECT *
+--FROM Customer
+--where Customer.id = 250;
 SELECT * 
 FROM Reservation r
-WHERE r.fid = 12;
+WHERE r.fid = 1;
 
 SELECT *
 FROM Flight f
-WHERE f.fnum = 12;
+WHERE f.fnum = 1;
 
 SELECT *
 FROM Customer c

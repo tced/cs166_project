@@ -603,9 +603,8 @@ public class DBproject{
                                 	String zipcode = in.readLine();
                                 	int rowCount = esql.executeQuery("SELECT nextval(\'rnum_seq\');");
                                 	int r_number = esql.getCurrSeqVal("rnum_seq");
-                                	//System.out.print(r_number);
                                 	String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ", \'W\');\n" ;
-                                	String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", " + fname + ", " + lname + ", " + gtype + ", " + dob + ", " + address + ", " + phone + ", " + zipcode + ");\n";
+                                	String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \' " + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n";
 					esql.executeUpdate(queryC);
 					System.out.print(queryC);
 					esql.executeUpdate(queryR);
@@ -641,11 +640,11 @@ public class DBproject{
 				int rowCount = esql.executeQuery("SELECT nextval(\'rnum_seq\');");
 				int r_number = esql.getCurrSeqVal("rnum_seq"); 
 				//System.out.print(r_number);
-				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ", R);\n" ;
-				String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", " + fname + ", " + lname + ", " + gtype + ", " + dob + ", " + address + ", " + phone + ", " + zipcode + ");\n"; 
+				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ",\'R\');\n" ;
+				String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \'" + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n"; 
 			  	List<List<String>>  my_query = esql.executeQueryAndReturnResult("SELECT f.num_sold FROM Flight f WHERE f.fnum = " + flight);
-                        	int num_sold = Integer.parseInt((result.get(0)).get(0));	
-				String queryF = "UPDATE Flight SET num_sold = " + Integer.toString(num_sold + 1) + " WHERE fnum = " + flight + " AND num_sold = " + Integer.toString(num_sold) + ");\n";
+                        	int num_sold = Integer.parseInt((my_query.get(0)).get(0));	
+				String queryF = "UPDATE Flight SET num_sold = num_sold + 1 WHERE fnum = " + flight + " AND num_sold = " + Integer.toString(num_sold) + ";\n";
 				esql.executeUpdate(queryC);
 				System.out.print(queryC);
 				esql.executeUpdate(queryR);
