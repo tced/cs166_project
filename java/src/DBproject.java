@@ -704,7 +704,8 @@ public class DBproject{
 	public static void ListsTotalNumberOfRepairsPerPlane(DBproject esql) {//7
 		// Count number of repairs per planes and list them in descending order
 		try {
-		  String query7; 
+		  String query7 = "SELECT repairs.plane_id FROM (  SELECT repair.plane_id, COUNT(repair.plane_id) AS total_repairs FROM  Repairs repair GROUP BY repair.plane_id ORDER BY total_repairs DESC, repair.plane_id DESC) AS repairs;" ; 
+		  esql.executeQueryAndPrintResult(query7);
 		}
 		catch (Exception e) {
 		 System.err.println(e.getMessage()); 
@@ -714,7 +715,8 @@ public class DBproject{
 	public static void ListTotalNumberOfRepairsPerYear(DBproject esql) {//8
 		// Count repairs per year and list them in ascending order
 		try {
-		  String query8; 
+		  String query8 = "SELECT years.year, COUNT(repair.repair_date) AS repairs_per_year FROM (  SELECT year FROM (SELECT DISTINCT EXTRACT (year FROM \"repair_date\") AS year FROM Repairs) AS distinct_years) AS years, Repairs repair WHERE years.year = (SELECT EXTRACT (year FROM \"repair_date\")) GROUP BY (years.year) ORDER BY repairs_per_year ASC;"; 
+		  esql.executeQueryAndPrintResult(query8); 
 		}
 		catch (Exception e) {
 		 System.err.println(e.getMessage()); 
