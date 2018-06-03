@@ -721,10 +721,60 @@ public class DBproject{
 		}
 	}
 	
+	//for a given flight and passenger status, return the number of passengers with the given status
 	public static void FindPassengersCountWithStatus(DBproject esql) {//9
 		// Find how many passengers there are with a status (i.e. W,C,R) and list that number.
+		String flight_num, status = ""; 
+		//int flight_num;
+		char convert_status;  
+		String query9; 
 		try {
-		  String query9; 
+		  do {
+		      System.out.print("Please enter the flight number: ");
+		      flight_num = in.readLine();
+	              if (flight_num.length() == 0) {
+		          System.out.print("Error, you did not enter a valid flight number. Please try again!\n"); 
+		      	  flag = false; 
+		      } 	
+		      else {flag = true; }
+		   }while(!flag); 
+		  do {
+		     System.out.print("Please enter the status you would like to see, in the form(W, R, C): "); 
+		     status = in.readLine();
+                     //System.out.print("this is the status that you entered: " + status + "\n");
+		     //char variable to check status 
+		     convert_status = status.charAt(0); 
+
+		     if (status == "C" || status == "W" || status == "R" ){
+		        flag = true; 
+	             }
+		     //if the status is c, but user wrote the wrong input 
+		     else if (status == "Confirmed" || convert_status == 'c' || status == "confirm" || status == "confirmed") {
+		        //System.out.print("Outputting c, changing it C"); 
+                        status = "C"; 
+                        flag = true;  
+		     }
+
+	  	     //if the status is w, but user wrote the wrong input 
+		     else if (status == "Waitlist" || convert_status == 'w' || status == "waitlist" || status == "waitlisted") {
+		     	status = "W"; 
+                        flag = true; 
+		     }
+
+		     //if the status is r, but user wrote the wrong input 
+		     else if (status == "reserved" || convert_status == 'r' || status == "reserve" || status == "Reserved") {
+		        status = "R"; 
+                        flag = true; 
+		     }
+
+		     else {System.out.print("You entered an incorrect status. Please try again.\n"); flag = false;}
+		  }while(!flag);  
+
+		 System.out.print("......Pulling up number of Passengers in status " + status + " in flight number " + flight_num + "........\n"); 
+		 query9 = "SELECT Count(r.cid) AS Num_Passengers_for_flight From Flight f, Reservation r WHERE r.fid = " + flight_num + "AND r.fid = f.fnum AND r.status = \'" + status + "\'"; 
+		 //System.out.print(query9); 
+		 esql.executeQueryAndPrintResult(query9); 
+		  
 		}
 		catch (Exception e) {
 		 System.err.println(e.getMessage()); 

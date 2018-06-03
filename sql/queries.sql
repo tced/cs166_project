@@ -34,17 +34,17 @@
 --SELECT *
 --FROM Customer
 --where Customer.id = 250;
-SELECT * 
-FROM Reservation r
-WHERE r.fid = 1;
+---SELECT * 
+--FROM Reservation r
+--WHERE r.fid = 1;
 
-SELECT *
-FROM Flight f
-WHERE f.fnum = 1;
+--SELECT *
+--FROM Flight f
+--WHERE f.fnum = 1;
 
-SELECT *
-FROM Customer c
-WHERE c.id = 250;
+--SELECT *
+--FROM Customer c
+--WHERE c.id = 250;
 
 --DROP SEQUENCE IF EXISTS test;
 --CREATE SEQUENCE rnum_seq START WITH 1000;
@@ -65,4 +65,10 @@ WHERE c.id = 250;
 --END;
 --$rnum$ LANGUAGE 'plpgsql';
 --CREATE TRIGGER rnum_seq BEFORE INSERT ON Reservation FOR EACH ROW EXECUTE PROCEDURE my_seq();
+
+
+----------**********testing for number 9**************-----------
+SELECT COUNT(r.cid) 
+FROM Reservation r, Flight f
+WHERE r.status = 'C' AND r.fid = 1279 AND r.fid = f.fnum;  
 
