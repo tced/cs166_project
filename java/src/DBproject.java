@@ -586,7 +586,31 @@ public class DBproject{
 					//if customer wants to be added to the waitlist, prompt for information
 					else if (answer.equalsIgnoreCase("yes")) {
 					System.out.print("Please enter the customer's id: ");
-					/////add//////
+					String cID = in.readLine();
+                                	System.out.print("Please enter the customer's first name:\n");
+                                	String fname = in.readLine();
+                                	System.out.print("Please enter the customer's last name:\n");
+                                	String lname = in.readLine();
+                                	System.out.print("Please enter the customer's gender:\n");
+                                	String gtype = in.readLine();
+                                	System.out.print("Please enter the customer's date of birth:\n");
+                                	String dob = in.readLine();
+                               		System.out.print("Please enter the customer's address:\n");
+                                	String address = in.readLine();
+                                	System.out.print("Please enter the customer's phone:\n");
+                                	String phone = in.readLine();
+                                	System.out.print("Please enter the customer's zipcode:\n");
+                                	String zipcode = in.readLine();
+                                	int rowCount = esql.executeQuery("SELECT nextval(\'rnum_seq\');");
+                                	int r_number = esql.getCurrSeqVal("rnum_seq");
+                                	//System.out.print(r_number);
+                                	String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ", \'W\');\n" ;
+                                	String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", " + fname + ", " + lname + ", " + gtype + ", " + dob + ", " + address + ", " + phone + ", " + zipcode + ");\n";
+					esql.executeUpdate(queryC);
+					System.out.print(queryC);
+					esql.executeUpdate(queryR);
+					System.out.print(queryR);
+					System.out.print("You have been added to the waitlist for flight " + flight + ".\n");
 					flag = true;
 					}
 					else {
@@ -619,11 +643,15 @@ public class DBproject{
 				//System.out.print(r_number);
 				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ", R);\n" ;
 				String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", " + fname + ", " + lname + ", " + gtype + ", " + dob + ", " + address + ", " + phone + ", " + zipcode + ");\n"; 
-				System.out.print(queryR);
+			  	List<List<String>>  my_query = esql.executeQueryAndReturnResult("SELECT f.num_sold FROM Flight f WHERE f.fnum = " + flight);
+                        	int num_sold = Integer.parseInt((result.get(0)).get(0));	
+				String queryF = "UPDATE Flight SET num_sold = " + Integer.toString(num_sold + 1) + " WHERE fnum = " + flight + " AND num_sold = " + Integer.toString(num_sold) + ");\n";
+				esql.executeUpdate(queryC);
 				System.out.print(queryC);
-				//executeUpdate(queryR);
-				//executeUpdate(queryC);
-				//----------------update num_sold in Flight table----------
+				esql.executeUpdate(queryR);
+				System.out.print(queryR);
+				esql.executeUpdate(queryF);
+				System.out.print(queryF);
 			}
 		
 		} 

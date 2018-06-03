@@ -16,19 +16,30 @@
 
 
 --number 5
-SELECT * --plane.seats
-FROM FlightInfo Info,Plane plane
-WHERE Info.plane_id = plane.id AND Info.flight_id = 12;
+--SELECT * --plane.seats
+--FROM FlightInfo Info,Plane plane
+--WHERE Info.plane_id = plane.id AND Info.flight_id = 12;
 
-SELECT * --flight.num_sold
-FROM Flight flight
-WHERE flight.fnum = 12;
+--SELECT * --flight.num_sold
+--FROM Flight flight
+--WHERE flight.fnum = 12;
 
-SELECT  (SELECT plane.seats
-FROM FlightInfo Info,Plane plane
-WHERE Info.plane_id = plane.id AND Info.flight_id = 12) - (SELECT flight.num_sold
-FROM Flight flight
-WHERE flight.fnum = 12) AS remainin_seats;
+--SELECT  (SELECT plane.seats
+--FROM FlightInfo Info,Plane plane
+--WHERE Info.plane_id = plane.id AND Info.flight_id = 12) - (SELECT flight.num_sold
+--FROM Flight flight
+--WHERE flight.fnum = 12) AS remainin_seats;
+SELECT * 
+FROM Reservation r
+WHERE r.fid = 12;
+
+SELECT *
+FROM Flight f
+WHERE f.fnum = 12;
+
+SELECT *
+FROM Customer c
+WHERE c.id = 250;
 
 --DROP SEQUENCE IF EXISTS test;
 --CREATE SEQUENCE rnum_seq START WITH 1000;
