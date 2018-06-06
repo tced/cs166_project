@@ -310,11 +310,20 @@ public class DBproject{
 			do {
 			 	System.out.print("-----------------------------------\nHello, you have selected to Add a Plane to the database.\nTo start, insert the plane's ID: "); 
 		  		plane_ID = in.readLine();
+				String check_planeID =  "SELECT EXISTS (SELECT 1 FROM Plane p WHERE p.id = " + plane_ID + ");"; 
 				if (plane_ID.length() == 0) {
 				   System.out.print("Your input is blank, please enter again\n"); 
 				   flag = false; 
 				}
-				else {flag = true; }
+				
+				else {	
+			            int see_result = esql.executeQuery(check_planeID); 
+			            if (see_result == 1){
+				    	System.out.print("Error has occurred! The plane ID you entered already exists. Please try again\n");
+					flag = false;  
+				    }
+				    else {flag = true; } 
+				}
 				 	
 			}while(!flag);	
 		
@@ -343,11 +352,12 @@ public class DBproject{
 			//do while loop to find plane age	
 		        do {
 				System.out.print("Insert the Plane's age: "); 
-		  		plane_age = Integer.parseInt(in.readLine()); 
+				plane_age = Integer.parseInt(in.readLine()); 
 				if (plane_age < 0) {
 				   System.out.print("Error plane age cannot be less than 0, please enter again\n"); 
 				   flag = false; 
 				}
+		                
 				else{ flag = true; }	
 			}while(!flag); 
 			//do while loop to find plane's seats 
@@ -385,11 +395,24 @@ public class DBproject{
 		  do {
 		  	System.out.print("Hello, you have selected Add Pilot.\nTo start, insert Pilot's ID: ");
                   	pilot_ID = in.readLine();
-			if (pilot_ID.length() == 0) {
+	                String check_pilotID = "SELECT EXISTS (SELECT 1 FROM Pilot p WHERE p.id = " + pilot_ID + ")"; 
+                        if (pilot_ID.length() == 0) {
 			   System.out.print("Error: you did not enter a valid pilot ID. Please try again\n"); 
 			   flag = false; 
+                             		
 			}
-			else {flag = true;}
+		
+			else {
+			   int see_result = esql.executeQuery(check_pilotID);
+	                   if(see_result == 1) {
+			      System.out.print("Error: that pilot ID already exists. Please try again\n"); 
+			      flag = false; 
+		           } 
+			   else {
+			      flag = true; 
+                           }
+                        }	
+		        	         
                   }while(!flag);
 	         
 		  //do while loop for pilot name 
@@ -430,12 +453,21 @@ public class DBproject{
 		try { 
 		  do { 
  		  	System.out.print("Hello, you have selected to Add Flight.\n To start, insert the flight's fnum: "); 
-		  	flight_fnum = in.readLine(); 
+		  	flight_fnum = in.readLine();
+			String find_flightfnum = "SELECT EXISTS (SELECT 1 FROM Flight f WHERE f.fnum = " + flight_fnum + ")";
 		  	if (flight_fnum.length() == 0) {
 				System.out.print("Error, you did not type a valid flight number. Please try again\n");
 			        flag = false;  
 			}
- 			else {flag = true;}
+			
+ 			else {
+				int see_result = esql.executeQuery(find_flightfnum);  
+			        if (see_result == 1) {
+				   System.out.print("Error has occurred!. The flight number entered already exists. Please try again\n"); 
+				   flag = false;
+				} 
+				else { flag = true;} 
+			}	
                   }while(!flag); 
 
 		  do {
@@ -532,11 +564,21 @@ public class DBproject{
 		  do{ 
                   	System.out.print("\n-----------------------------------------------------------\nYou have selected to Add a Technician to the database.\nTo start, insert Technician's ID: ");
                   	tech_ID = in.readLine();
+			String check_techID = "SELECT EXISTS (SELECT 1 FROM Technician t WHERE t.id = " + tech_ID + ")"; 
                   	if (tech_ID.length() == 0) {
 			  System.out.print("Error, you did not insert a technician's ID. Please Try Again\n"); 
 	  		  flag = false; 
 			}
-                        else {flag = true;} 
+			
+                        else {
+			   
+			   int see_result = esql.executeQuery(check_techID); 
+			   if (see_result == 1) {
+			  System.out.print("Error has occurred! The tech ID you entered already exists. Please Try Again\n"); 
+			  flag = false; 
+			   }   
+			   else{flag = true;}
+			} 
 		  }while(!flag); 
 	
 		  do{
