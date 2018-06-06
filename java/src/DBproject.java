@@ -305,13 +305,13 @@ public class DBproject{
 		String plane_ID, plane_make, plane_model = "";  
 		int plane_age, plane_seats = 0;
 		try { 
-			
+		        	
  			//do while loop to find the plane_ID 
 			do {
-			 	System.out.print("Insert the plane's ID: "); 
+			 	System.out.print("-----------------------------------\nHello, you have selected to Add a Plane to the database.\nTo start, insert the plane's ID: "); 
 		  		plane_ID = in.readLine();
 				if (plane_ID.length() == 0) {
-				   System.out.print("Invalid ID, please enter again\n"); 
+				   System.out.print("Your input is blank, please enter again\n"); 
 				   flag = false; 
 				}
 				else {flag = true; }
@@ -320,7 +320,7 @@ public class DBproject{
 		
 			//do while loop to find the plane make
 			do {
-				System.out.print("Insert the Plane's make: ");
+				System.out.print("Next, insert the Plane's make: ");
 		  		plane_make = in.readLine();	
 				if (plane_make.length() == 0 || plane_make.length() > 32) {
 				   System.out.print("Please enter a vaid plane make: "); 
@@ -383,7 +383,7 @@ public class DBproject{
                  
 		  //do while loop for pilot id 
 		  do {
-		  	System.out.print("Insert Pilot's ID: ");
+		  	System.out.print("Hello, you have selected Add Pilot.\nTo start, insert Pilot's ID: ");
                   	pilot_ID = in.readLine();
 			if (pilot_ID.length() == 0) {
 			   System.out.print("Error: you did not enter a valid pilot ID. Please try again\n"); 
@@ -429,8 +429,8 @@ public class DBproject{
 
 		try { 
 		  do { 
- 		  	System.out.print("Insert the flight's fnum: "); 
-		  	flight_fnum = in.readLine();
+ 		  	System.out.print("Hello, you have selected to Add Flight.\n To start, insert the flight's fnum: "); 
+		  	flight_fnum = in.readLine(); 
 		  	if (flight_fnum.length() == 0) {
 				System.out.print("Error, you did not type a valid flight number. Please try again\n");
 			        flag = false;  
@@ -530,7 +530,7 @@ public class DBproject{
 		String tech_ID, tech_name = ""; 
 		try {
 		  do{ 
-                  	System.out.print("Insert Technician's ID: ");
+                  	System.out.print("\n-----------------------------------------------------------\nYou have selected to Add a Technician to the database.\nTo start, insert Technician's ID: ");
                   	tech_ID = in.readLine();
                   	if (tech_ID.length() == 0) {
 			  System.out.print("Error, you did not insert a technician's ID. Please Try Again\n"); 
@@ -561,19 +561,13 @@ public class DBproject{
 	public static void BookFlight(DBproject esql) {//5
 		// Given a customer and a flight that he/she wants to book, add a reservation to the DB
 		try {
-			System.out.print("Enter the Flight number you would like to book a reservation for: ");
+			System.out.print("You have selected to Book a flight. To start, enter the Flight number you would like to book a reservation for: ");
 			String flight = in.readLine();
 			String check = "SELECT  (SELECT plane.seats FROM FlightInfo Info,Plane plane WHERE Info.plane_id = plane.id AND Info.flight_id = " + flight + ") - (SELECT flight.num_sold FROM Flight flight WHERE flight.fnum = " + flight + ") AS remainin_seats;\n";
 			
 			List<List<String>>  result = esql.executeQueryAndReturnResult(check);
 			int available_seats = Integer.parseInt((result.get(0)).get(0));
-			//esql.executeUpdate("DROP TRIGGER IF EXISTS seq ON Reservation;");
-			//esql.executeUpdate("CREATE OR REPLACE FUNCTION my_seq() RETURNS trigger AS $rnum$ BEGIN IF NOT EXISTS ( SELECT 0 FROM pg_class WHERE relname = \'rnum_seq\') THEN CREATE SEQUENCE rnum_seq START WITH 10000; ELSE new.rnum = nextval(\'rnum_seq\'); END IF; RETURN new; END; $rnum$ LANGUAGE \'plpgsql\'; CREATE TRIGGER seq BEFORE INSERT ON Reservation FOR EACH ROW EXECUTE PROCEDURE my_seq();");
-
-			System.out.print(available_seats);
-			System.out.print("\n");
-			esql.executeUpdate("DROP SEQUENCE IF EXISTS rnum_seq; CREATE SEQUENCE rnum_seq START WITH 10000;");
-
+			
 			//if no more seats available prompt if customer would like to be added to the waitlist 
 			if (available_seats == 0) {
 				System.out.print("There are no more seats available for flight " + flight + ". Do you want to be addded to the waitlist?(Yes | No)\n");
@@ -601,9 +595,7 @@ public class DBproject{
                                 	String phone = in.readLine();
                                 	System.out.print("Please enter the customer's zipcode:\n");
                                 	String zipcode = in.readLine();
-                                	int rowCount = esql.executeQuery("SELECT nextval(\'rnum_seq\');");
-                                	int r_number = esql.getCurrSeqVal("rnum_seq");
-                                	String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ", \'W\');\n" ;
+                                	String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES ( NULL, " + cID + ", " + flight + ", \'W\');\n" ;
                                 	String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \' " + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n";
 					esql.executeUpdate(queryC);
 					System.out.print(queryC);
@@ -637,10 +629,7 @@ public class DBproject{
                                 String phone = in.readLine();
 				System.out.print("Please enter the customer's zipcode:\n");
                                 String zipcode = in.readLine();
-				int rowCount = esql.executeQuery("SELECT nextval(\'rnum_seq\');");
-				int r_number = esql.getCurrSeqVal("rnum_seq"); 
-				//System.out.print(r_number);
-				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES (" + Integer.toString(r_number) + ", " + cID + ", " + flight + ",\'R\');\n" ;
+				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES ( NULL, " + cID + ", " + flight + ",\'R\');\n" ;
 				String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \'" + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n"; 
 			  	List<List<String>>  my_query = esql.executeQueryAndReturnResult("SELECT f.num_sold FROM Flight f WHERE f.fnum = " + flight);
                         	int num_sold = Integer.parseInt((my_query.get(0)).get(0));	
@@ -666,7 +655,7 @@ public class DBproject{
 		
 		   //do while loop to find flight number 
                    do{
-                   	System.out.print("Enter flight num: "); 
+                   	System.out.print("You have selected to find number of available seats.\n To start, enter flight num: "); 
 		   	flight_num = in.readLine();
 			if (flight_num.length() == 0) {
 			   System.out.print("Error, you did not enter a flight number. Please try again\n"); 
@@ -704,6 +693,7 @@ public class DBproject{
 	public static void ListsTotalNumberOfRepairsPerPlane(DBproject esql) {//7
 		// Count number of repairs per planes and list them in descending order
 		try {
+                  System.out.print("You are finding the total number of repairs per plane.\nGrabbing the information for you....\n"); 
 		  String query7 = "SELECT repairs.plane_id FROM (  SELECT repair.plane_id, COUNT(repair.plane_id) AS total_repairs FROM  Repairs repair GROUP BY repair.plane_id ORDER BY total_repairs DESC, repair.plane_id DESC) AS repairs;" ; 
 		  esql.executeQueryAndPrintResult(query7);
 		}
@@ -715,6 +705,7 @@ public class DBproject{
 	public static void ListTotalNumberOfRepairsPerYear(DBproject esql) {//8
 		// Count repairs per year and list them in ascending order
 		try {
+		  System.out.print("You are finding the total number of repairs per year.\n Grabbing the information for you...\n"); 
 		  String query8 = "SELECT years.year, COUNT(repair.repair_date) AS repairs_per_year FROM (  SELECT year FROM (SELECT DISTINCT EXTRACT (year FROM \"repair_date\") AS year FROM Repairs) AS distinct_years) AS years, Repairs repair WHERE years.year = (SELECT EXTRACT (year FROM \"repair_date\")) GROUP BY (years.year) ORDER BY repairs_per_year ASC;"; 
 		  esql.executeQueryAndPrintResult(query8); 
 		}
@@ -732,7 +723,7 @@ public class DBproject{
 		String query9; 
 		try {
 		  do {
-		      System.out.print("Please enter the flight number: ");
+		      System.out.print("You are finding the number of passengers according to status. To start, please enter the flight number: ");
 		      flight_num = in.readLine();
 	              if (flight_num.length() == 0) {
 		          System.out.print("Error, you did not enter a valid flight number. Please try again!\n"); 

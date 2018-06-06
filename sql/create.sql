@@ -10,6 +10,15 @@ DROP TABLE IF EXISTS FlightInfo CASCADE;--OK
 DROP TABLE IF EXISTS Repairs CASCADE;--OK
 DROP TABLE IF EXISTS Schedule CASCADE;--OK
 
+--ADDED: DROP INDEX IF EXISTS 
+DROP INDEX IF EXISTS find_plane_seats CASCADE;  
+DROP INDEX IF EXISTS flight_query6 CASCADE; 
+DROP INDEX IF EXISTS flight_frm_schedule CASCADE; 
+DROP INDEX IF EXISTS flightinfo_id CASCADE; 
+DROP INDEX IF EXISTS plane_repairs_index CASCADE; 
+DROP INDEX IF EXISTS repair_date_index CASCADE; 
+DROP INDEX IF EXISTS query9_reservation_index CASCADE; 
+DROP INDEX IF EXISTS query9_flightfnum CASCADE; 
 -------------
 ---DOMAINS---
 -------------
@@ -23,7 +32,7 @@ CREATE DOMAIN _YEAR_1970 AS int4 CHECK(VALUE >= 0);
 CREATE DOMAIN _SEATS AS int4 CHECK(VALUE > 0 AND VALUE < 500);--Plane Seats
 
 ------------
---CREATE SEQUENCE res_num START WITH 10000;
+CREATE SEQUENCE rnum_seq START WITH 10000;
 
 ------------
 ---TABLES---
@@ -38,9 +47,8 @@ CREATE TABLE Customer
 	address CHAR(256),
 	phone CHAR(10),
 	zipcode char(10),
-	PRIMARY KEY (id)
+	PRIMARY KEY (id) 
 );
-
 CREATE TABLE Pilot
 (
 	id INTEGER NOT NULL,
@@ -61,6 +69,7 @@ CREATE TABLE Flight
 	departure_airport CHAR(5) NOT NULL,-- AIRPORT CODE --
 	PRIMARY KEY (fnum)
 );
+ 
 
 CREATE TABLE Plane
 (
@@ -78,7 +87,6 @@ CREATE TABLE Technician
 	full_name CHAR(128) NOT NULL,
 	PRIMARY KEY (id)
 );
-
 ---------------
 ---RELATIONS---
 ---------------
@@ -93,6 +101,7 @@ CREATE TABLE Reservation
 	FOREIGN KEY (cid) REFERENCES Customer(id),
 	FOREIGN KEY (fid) REFERENCES Flight(fnum)
 );
+ 
 
 CREATE TABLE FlightInfo
 (
@@ -130,7 +139,44 @@ CREATE TABLE Schedule
 	FOREIGN KEY (flightNum) REFERENCES Flight(fnum)
 );
 
-----------------------------
+DROP TRIGGER IF EXISTS rnum ON Reservation; 
+CREATE OR REPLACE FUNCTION my_seq() returns TRIGGER AS $rnum$ 
+BEGIN 
+	new.rnum = nextval('rnum_seq'); 
+        return new; 
+END; 
+$rnum$language plpgsql volatile; 
+CREATE TRIGGER rnum before INSERT ON Reservation for each row EXECUTE PROCEDURE my_seq(); 
+---------------------------
+----------INDEXES----------
+---------------------------
+--don't need indexes for first four queries 
+--missing indexes for query 5
+
+--for query6 
+CREATE INDEX find_plane_seats 
+ON Plane(seats, id); 
+CREATE INDEX flight_query6
+ON Flight(num_sold, fnum, actual_departure_date); 
+CREATE INDEX flight_frm_schedule 
+ON Schedule(flightNum); 
+CREATE INDEX flightinfo_id 
+ON FlightInfo(flight_id, plane_id);
+
+--for query7 
+CREATE INDEX plane_repairs_index 
+ON Repairs(plane_id); 
+
+--for query8 
+CREATE INDEX repair_date_index 
+ON Repairs(repair_date); 
+
+--for query9 
+CREATE INDEX query9_reservation_index 
+ON Reservation(fid, status); 
+CREATE INDEX query9_flightfnum
+ON Flight(fnum); 
+--------------------------- 
 -- INSERT DATA STATEMENTS --
 ----------------------------
 
