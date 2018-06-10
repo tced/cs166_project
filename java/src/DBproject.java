@@ -413,7 +413,9 @@ public class DBproject{
 			query +=  plane_ID + ", \'" + plane_make + "\'" + ", \'" + plane_model + "\'" + "," + plane_age + "," + plane_seats + ")\n";
 
 		 	//System.out.print(query);
-		  	esql.executeUpdate(query); 
+		  	esql.executeUpdate(query);
+		
+		        System.out.print("\nWe have updated the database with your information.\n");  
 			Stream.generate(()->"*").limit(100).forEach(System.out::print); 
 			System.out.print("\n");   
   		}
@@ -478,6 +480,7 @@ public class DBproject{
 		  	}while(!flag);
 		  	query2 +=  pilot_ID + ", \'" + pilot_name + "\'" + ", \'" + pilot_nationality + "\');\n";
                   	esql.executeUpdate(query2);
+			System.out.print("\nWe have updated the database with your information.\n"); 
 			Stream.generate(()->"*").limit(100).forEach(System.out::print);
                         System.out.print("\n");
                 }
@@ -623,6 +626,7 @@ public class DBproject{
 	          	query3 +=  flight_fnum + ", " + flight_cost + ", " + num_seats_sold + "," + num_flight_stops + ", \'" + plane_dept_date + "\'" + ", \'" + plane_arrival_date + "\'" + ", \'" + airport_arrival + "\'" + ", \'" + airport_depart + "\')\n"; 
 		  
 		  	esql.executeUpdate(query3); 	
+			System.out.print("\nWe have updated the database with your information.\n");
 			Stream.generate(()->"*").limit(100).forEach(System.out::print);
                         System.out.print("\n");
 		}
@@ -677,6 +681,7 @@ public class DBproject{
 		
                   	query4 +=  tech_ID + ", \'" + tech_name + "\');\n";
                   	esql.executeUpdate(query4);
+			System.out.print("\nWe have updated the database with your information.\n"); 
 			Stream.generate(()->"*").limit(100).forEach(System.out::print);
                         System.out.print("\n");
                 }
@@ -846,6 +851,7 @@ public class DBproject{
                                                                         }
 									else { flag = true; }
 								}
+								flag = true; 
 							}
 						}while(!flag);
 //terminate function---------------------------------------------------------------------------
