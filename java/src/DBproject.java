@@ -10,7 +10,6 @@
  *
  */
 
-
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -23,6 +22,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Stream;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 /**
  * This class defines a simple embedded SQL utility class that is designed to
@@ -299,87 +301,122 @@ public class DBproject{
 		return input;
 	}//end readChoice
 
+	//helper function
+	public static boolean validDate(String date) {
+		SimpleDateFormat my_format = new SimpleDateFormat("yyyy-MM-dd");
+		Date testDate = null;
+		try {
+			testDate = my_format.parse(date);
+		} catch (Exception e) {
+			System.out.print("Error: Invalid Input. Enter the date as YYYY-MM-DD\n");
+			return false;
+		}
+		return true;
+	}
+	
 	public static boolean flag = true; 
 	public static void AddPlane(DBproject esql) {//1
 		String query = "INSERT INTO Plane (id, make, model, age, seats) VALUES(";  
 		String plane_ID, plane_make, plane_model = "";  
-		int plane_age, plane_seats = 0;
+		int plane_age = 0, plane_seats = 0;
+		String age, seats = "";
 		try { 
-		        	
+		        
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+			System.out.print("\nHello, you have selected to add a plane to the database.\nTo start, insert the plane's ID: ");	
  			//do while loop to find the plane_ID 
-			do {
-			 	System.out.print("-----------------------------------\nHello, you have selected to Add a Plane to the database.\nTo start, insert the plane's ID: "); 
+			do { 
 		  		plane_ID = in.readLine();
-				String check_planeID =  "SELECT EXISTS (SELECT 1 FROM Plane p WHERE p.id = " + plane_ID + ");"; 
 				if (plane_ID.length() == 0) {
-				   System.out.print("Your input is blank, please enter again\n"); 
+				   System.out.print("Error: Invalid Input. Please enter the plane's ID again\n"); 
 				   flag = false; 
 				}
-				
 				else {	
-			            int see_result = esql.executeQuery(check_planeID); 
-			            if (see_result == 1){
-				    	System.out.print("Error has occurred! The plane ID you entered already exists. Please try again\n");
-					flag = false;  
-				    }
-				    else {flag = true; } 
+					if(!plane_ID.matches("\\d+")) {
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+					else {
+						String check_planeID =  "SELECT EXISTS (SELECT 1 FROM Plane p WHERE p.id = " + plane_ID + ");";
+			            		List<List<String>> see_result = esql.executeQueryAndReturnResult(check_planeID); 
+						char exists = ((see_result.get(0)).get(0)).charAt(0);
+			            		if (exists == 't'){
+				    			System.out.print("Error: The plane ID you entered already exists. Please try again\n");
+							flag = false; 
+				   		 }
+				   	 	else {flag = true; }
+					}
 				}
 				 	
 			}while(!flag);	
-		
+			
+			System.out.print("Next, insert the Plane's make: ");
 			//do while loop to find the plane make
 			do {
-				System.out.print("Next, insert the Plane's make: ");
 		  		plane_make = in.readLine();	
 				if (plane_make.length() == 0 || plane_make.length() > 32) {
-				   System.out.print("Please enter a vaid plane make: "); 
+				   System.out.print("Error: Invalid Input. Please enter a valid plane make\n"); 
 				   flag = false; 
 				}
 				else{ flag = true; }
 			}while(!flag);
- 
+			
+			System.out.print("Insert the Plane's model: "); 
 			//do while loop to find the plane model 
 		        do {
-				System.out.print("Insert the Plane's model: ");
 		  		plane_model = in.readLine();	
 				if (plane_model.length() == 0 || plane_model.length() > 64) {
-				   System.out.print("Invalid plane model, please enter again\n"); 
+				   System.out.print("Error: Invalid Input. Please enter a valid plane model\n"); 
 				   flag = false; 
 				}
 				else{ flag = true; }	
 			}while(!flag); 
-	
+
+			System.out.print("Insert the Plane's age: ");	
 			//do while loop to find plane age	
-		        do {
-				System.out.print("Insert the Plane's age: "); 
-				plane_age = Integer.parseInt(in.readLine()); 
-				if (plane_age < 0) {
-				   System.out.print("Error plane age cannot be less than 0, please enter again\n"); 
-				   flag = false; 
-				}
-		                
-				else{ flag = true; }	
+		        do { 
+				age = in.readLine();
+				//plane_age = Integer.parseInt(age);
+				if(!age.matches("\\d+")) {
+                                	System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+                                        flag = false;
+                                 }
+				else {
+					plane_age = Integer.parseInt(age);
+					if (plane_age < 0) {
+				   	System.out.print("Error: Invalid Input. Plane age cannot be less than 0. Please enter the plane's age again\n"); 
+				   	flag = false; 
+					}
+					else{ flag = true; }
+				}	
 			}while(!flag); 
+
+			System.out.print("Insert how many seats the Plane contains: ");	
 			//do while loop to find plane's seats 
 			do {
-				System.out.print("Insert how many seats the Plane contains: ");
-		  		plane_seats = Integer.parseInt(in.readLine()); 
-				if (plane_seats < 0 || plane_seats > 500) {
-				   System.out.print("Error: you entered a plane seat that's out of bounds. Please Try again.\n"); 
-				   flag = false; 
+		  		seats = in.readLine();
+				if(!seats.matches("\\d++")) {
+					System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+					flag = false;
 				}
-				else{
-				   flag = true; 
+				else {
+					plane_seats = Integer.parseInt(seats);
+					if (plane_seats <= 0 || plane_seats >= 500) {
+				   		System.out.print("Error: Invalid Input. The number of seats must be greater than 0 and less than 500. Please enter the number of seats again.\n"); 
+				   		flag = false; 
+					}
+					else{
+				   		flag = true; 
+					}
 				}
 			}while(!flag); 
 			query +=  plane_ID + ", \'" + plane_make + "\'" + ", \'" + plane_model + "\'" + "," + plane_age + "," + plane_seats + ")\n";
-			//int rowCount = esql.executeQuery(query); 
-			//System.out.println("total rows(s): " + rowCount); 
 
-		 	System.out.print(query);
+		 	//System.out.print(query);
 		  	esql.executeUpdate(query); 
-			    
-  					}
+			Stream.generate(()->"*").limit(100).forEach(System.out::print); 
+			System.out.print("\n");   
+  		}
 		catch (Exception e) {
 			System.err.println(e.getMessage());
 
@@ -390,58 +427,62 @@ public class DBproject{
 		String query2 = "INSERT INTO Pilot (id, fullname, nationality) VALUES(";
 		String pilot_ID, pilot_name, pilot_nationality = ""; 
 		try {
-                 
-		  //do while loop for pilot id 
-		  do {
-		  	System.out.print("Hello, you have selected Add Pilot.\nTo start, insert Pilot's ID: ");
-                  	pilot_ID = in.readLine();
-	                String check_pilotID = "SELECT EXISTS (SELECT 1 FROM Pilot p WHERE p.id = " + pilot_ID + ")"; 
-                        if (pilot_ID.length() == 0) {
-			   System.out.print("Error: you did not enter a valid pilot ID. Please try again\n"); 
-			   flag = false; 
-                             		
-			}
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+		  	System.out.print("\nHello, you have selected to add a pilot to the database.\nTo start, insert the pilot's ID: ");
+		  	//do while loop for pilot id 
+		  	do {
+                  		pilot_ID = in.readLine(); 
+                        	if (pilot_ID.length() == 0) {
+			   		System.out.print("Error: Invalid Input. Please enter the pilot's ID again\n"); 
+			   		flag = false;      		
+				}
 		
-			else {
-			   int see_result = esql.executeQuery(check_pilotID);
-	                   if(see_result == 1) {
-			      System.out.print("Error: that pilot ID already exists. Please try again\n"); 
-			      flag = false; 
-		           } 
-			   else {
-			      flag = true; 
-                           }
-                        }	
-		        	         
-                  }while(!flag);
-	         
-		  //do while loop for pilot name 
-                  do {
+				else {
+					if(!pilot_ID.matches("\\d+")) {
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+	                   		else {
+						String check_pilotID = "SELECT EXISTS (SELECT 1 FROM Pilot p WHERE p.id = " + pilot_ID + ")";
+						List<List<String>> see_result = esql.executeQueryAndReturnResult(check_pilotID);
+						char exists = ((see_result.get(0)).get(0).charAt(0));
+						if (exists == 't') {
+							System.out.print("Error: The pilot ID you entered already exists. Please try again\n");
+							flag = false;
+			    			} 
+			   			else { flag = true; }
+                       		 	}
+				}	        
+                  	}while(!flag);
+	        	
 			System.out.print("Insert Pilot's fullname: ");
-                  	pilot_name = in.readLine();
-			if (pilot_name.length() > 128) {
-			   System.out.print("Error: invalid pilot name. Please try again\n"); 
-			   flag = false; 
-			}
-			else {flag = true;} 
-                  }while(!flag); 
-
-		  //do while loop for pilot's nationality 
-		  do {
-		   	System.out.print("Insert the Pilot's nationality: ");
-                 	pilot_nationality = in.readLine();
- 			if (pilot_nationality.length() > 25) {
-			   System.out.print("Error: invalid nationality. Please try again\n"); 
-			}
-			else {flag = true;}
-		  }while(!flag);
-		  query2 +=  pilot_ID + ", \'" + pilot_name + "\'" + ", \'" + pilot_nationality + "\');\n";
-		  
-                  System.out.print(query2);
-                  esql.executeUpdate(query2);
+ 			//do while loop for pilot name 
+                  	do {
+                  		pilot_name = in.readLine();
+				if (pilot_name.length() > 128) {
+			   		System.out.print("Error: Invalid Input. Too many characters entered. Please try again\n"); 
+			   		flag = false; 
+				}
+				else {flag = true;} 
+                  	}while(!flag); 
+			
+			System.out.print("Insert the Pilot's nationality: ");
+		  	//do while loop for pilot's nationality 
+		  	do {
+                 		pilot_nationality = in.readLine();
+ 				if (pilot_nationality.length() > 25) {
+			   		System.out.print("Error: Invalid Input. Too many characters entered. Please try again\n"); 
+					flag = false;
+				}
+				else {flag = true;}
+		  	}while(!flag);
+		  	query2 +=  pilot_ID + ", \'" + pilot_name + "\'" + ", \'" + pilot_nationality + "\');\n";
+                  	esql.executeUpdate(query2);
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
                 }
                 catch (Exception e) {
-                  System.err.println(e.getMessage());
+                	System.err.println(e.getMessage());
                 }
 	}
 
@@ -450,106 +491,140 @@ public class DBproject{
 		String query3 = "INSERT INTO Flight (fnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_airport, departure_airport) VALUES("; 
 		String flight_fnum, flight_cost, num_seats_sold, num_flight_stops, plane_dept_date, plane_arrival_date, airport_arrival, airport_depart = "";
 
-		try { 
-		  do { 
- 		  	System.out.print("Hello, you have selected to Add Flight.\n To start, insert the flight's fnum: "); 
-		  	flight_fnum = in.readLine();
-			String find_flightfnum = "SELECT EXISTS (SELECT 1 FROM Flight f WHERE f.fnum = " + flight_fnum + ")";
-		  	if (flight_fnum.length() == 0) {
-				System.out.print("Error, you did not type a valid flight number. Please try again\n");
-			        flag = false;  
-			}
-			
- 			else {
-				int see_result = esql.executeQuery(find_flightfnum);  
-			        if (see_result == 1) {
-				   System.out.print("Error has occurred!. The flight number entered already exists. Please try again\n"); 
-				   flag = false;
-				} 
-				else { flag = true;} 
-			}	
-                  }while(!flag); 
+		try {
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\nHello, you have selected to add a flight to the database.\nTo start, insert the flight's number: ");
+ 
+		  	do { 
+		  		flight_fnum = in.readLine();
+		  		if (flight_fnum.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter the flight's number again\n");
+			        	flag = false;  
+				}	
+ 				else {
+					if(!flight_fnum.matches("\\d+")) {
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+					else {
+						String find_flightfnum = "SELECT EXISTS (SELECT 1 FROM Flight f WHERE f.fnum = " + flight_fnum + ")";
+						List<List<String>> see_result = esql.executeQueryAndReturnResult(find_flightfnum);
+						char exists = ((see_result.get(0)).get(0)).charAt(0);  
+			        		if (exists == 't') {
+				   			System.out.print("Error: The flight number you entered already exists. Please try again\n"); 
+				   			flag = false;
+						} 
+						else { flag = true;} 
+					}
+				}	
+                  	}while(!flag); 
 
-		  do {
 		  	System.out.print("Insert the flight's cost: ");
-		  	flight_cost = in.readLine();
-			if (flight_cost.length() == 0) {
-				System.out.print("Error, you did not type a valid flight cost. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
-		  }while(!flag); 
+			//do while loop to check for flight's cost
+			do {
+		  		flight_cost = in.readLine();
+				if (flight_cost.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter the flight's cost\n"); 
+					flag = false; 
+				}
+				else {
+					if(!flight_cost.matches("\\d+") || Integer.parseInt(flight_cost) == 0) {
+						System.out.print("Error: Invalid Input. Please enter a numeric value grater than 0\n");
+						flag = false;
+					}
+					else {flag = true;}
+				}
+		  	}while(!flag); 
 
-		  do{ 
-		  	System.out.print("Insert how many seats have been sold: ");
-		  	num_seats_sold = in.readLine(); 
-		  	if (num_seats_sold.length() == 0) {
-				System.out.print("Error, you did not type a valid number for seats sold. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
+			System.out.print("Insert how many seats have been sold: ");
+			//do while loop to check for valid number of seats
+		  	do{ 
+		  		num_seats_sold = in.readLine(); 
+		  		if (num_seats_sold.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter a valid number\n"); 
+					flag = false; 
+				}
+				else {
+                                        if(!num_seats_sold.matches("\\d+")) {
+                                                System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+                                                flag = false;
+                                        }
+                                        else {flag = true;}
+                                }
+		  	}while(!flag); 
 
-		  }while(!flag); 
+			System.out.print("Insert the number of stops that flight has: ");
+			//do while loop to check for valid number of stops
+		  	do{ 
+		  		num_flight_stops = in.readLine(); 
+		  		if (num_flight_stops.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter a valid number\n"); 
+					flag = false; 
+				}
+				else {
+					if(!num_flight_stops.matches("\\d+")) {
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");                                                                                                                    flag = false;
+					}
+					else {flag = true;}
+				}
+		  	}while(!flag); 
 
-		  do{
-		  	System.out.print("Insert the number of stops that flight has: "); 
-		  	num_flight_stops = in.readLine(); 
-		  	if (num_flight_stops.length() == 0) {
-				System.out.print("Error, you did not type a valid number of flights stop. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
+			System.out.print("Insert the flight's actual departure date in the following format YYYY-MM-DD: ");
+			//do while loop to check for valid date
+		  	do{
+				plane_dept_date = in.readLine();
+		  		if (plane_dept_date.length() == 0) {
+					System.out.print("Error: Invalid Input. Enter the date as YYYY-MM-DD\n"); 
+					flag = false; 
+				}
+				else {
+					if( !validDate(plane_dept_date) ) { flag = false;}
+					else {flag = true;}
+				}
+		  	}while(!flag); 
 
-		  }while(!flag); 
+			System.out.print("Insert the flight's actual arrival date in the following format YYYY-MM-DD: ");
+			//do while loop to check for valid date
+		  	do{
+		  		plane_arrival_date = in.readLine(); 
+		  		if (plane_arrival_date.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter the date as YYYY-MM-DD\n"); 
+					flag = false; 
+				}
+				else{
+					if ( !validDate(plane_arrival_date) ) { flag = false;}	
+					else {flag = true;}
+				}
+		  	}while(!flag); 
 
-		  do{
-		  	System.out.print("Insert the flight's actual departure date in the following format YYYY-MM-DD: ");
-		  	plane_dept_date = in.readLine(); 
-		  	if (plane_dept_date.length() == 0) {
-				System.out.print("Error, you did not type a valid departure date. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
+			System.out.print("Insert the airport's code that the flight will be arriving at: ");
+			//do while loop to check for valid airport code
+		  	do{ 
+		  		airport_arrival = in.readLine(); 
+		  		if (airport_arrival.length() > 5 || airport_arrival.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter a valid 5 digit code\n"); 
+					flag = false; 
+				}
+				else {flag = true;}
 
-		  }while(!flag); 
+		  	}while(!flag); 
 
-		  do{
-		  	System.out.print("Insert the flight's actual arrival date in the following format YYYY-MM-DD: "); 
-		  	plane_arrival_date = in.readLine(); 
-		  	if (plane_arrival_date.length() == 0) {
-				System.out.print("Error, you did not type a valid flight arrival date. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
-
-		  }while(!flag); 
-
-		  do{
-		  	System.out.print("Insert the airport's code that the flight will be arriving at: "); 
-		  	airport_arrival = in.readLine(); 
-		  	if (airport_arrival.length() > 5 || airport_arrival.length() == 0) {
-				System.out.print("Error, you did not type a valid airport name. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
-
-		  }while(!flag); 
-
-	          do {
-		  	System.out.print("Insert the airport's code that the flight will be departing from: "); 
-		  	airport_depart = in.readLine(); 
-		  	if (airport_depart.length() == 0 || airport_depart.length() > 5) {
-				System.out.print("Error, you did not type a valid airport code for departure. Please try again\n"); 
-				flag = false; 
-			}
-			else {flag = true;}
-
-		  }while(!flag); 	
+			System.out.print("Insert the airport's code that the flight will be departing from: ");
+			//do while loop to check for valid airport code
+	          	do {
+		  		airport_depart = in.readLine(); 
+		  		if (airport_depart.length() == 0 || airport_depart.length() > 5) {
+					System.out.print("Error: Invalid Input. Please enter a valid 5 digit code\n"); 
+					flag = false; 
+				}
+				else {flag = true;}
+		  	}while(!flag); 	
 	
-	          query3 +=  flight_fnum + ", " + flight_cost + ", " + num_seats_sold + "," + num_flight_stops + ", \'" + plane_dept_date + "\'" + ", \'" + plane_arrival_date + "\'" + ", \'" + airport_arrival + "\'" + ", \'" + airport_depart + "\')\n"; 
+	          	query3 +=  flight_fnum + ", " + flight_cost + ", " + num_seats_sold + "," + num_flight_stops + ", \'" + plane_dept_date + "\'" + ", \'" + plane_arrival_date + "\'" + ", \'" + airport_arrival + "\'" + ", \'" + airport_depart + "\')\n"; 
 		  
-		  System.out.print(query3);
-		  esql.executeUpdate(query3); 	
+		  	esql.executeUpdate(query3); 	
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
 		}
 		catch (Exception e) {
 		  System.err.println(e.getMessage());
@@ -557,43 +632,53 @@ public class DBproject{
 
  	}
 	
+
+		
 	public static void AddTechnician(DBproject esql) {//4
                 String query4 = "INSERT INTO Technician (id, full_name) VALUES(";
 		String tech_ID, tech_name = ""; 
 		try {
-		  do{ 
-                  	System.out.print("\n-----------------------------------------------------------\nYou have selected to Add a Technician to the database.\nTo start, insert Technician's ID: ");
-                  	tech_ID = in.readLine();
-			String check_techID = "SELECT EXISTS (SELECT 1 FROM Technician t WHERE t.id = " + tech_ID + ")"; 
-                  	if (tech_ID.length() == 0) {
-			  System.out.print("Error, you did not insert a technician's ID. Please Try Again\n"); 
-	  		  flag = false; 
-			}
-			
-                        else {
-			   
-			   int see_result = esql.executeQuery(check_techID); 
-			   if (see_result == 1) {
-			  System.out.print("Error has occurred! The tech ID you entered already exists. Please Try Again\n"); 
-			  flag = false; 
-			   }   
-			   else{flag = true;}
-			} 
-		  }while(!flag); 
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\nHello, you have selected to add a technician to the database.\nTo start, insert the technician's ID: ");
+		  	do{ 
+                  		tech_ID = in.readLine();
+                  		if (tech_ID.length() == 0) {
+			  		System.out.print("Error: Invalid Input. Please enter the technician's ID again\n"); 
+	  			  	flag = false; 
+				}
+				else {
+					if (!tech_ID.matches("\\d+") ){
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+					else {
+						String check_techID = "SELECT EXISTS (SELECT 1 FROM Technician tech WHERE TECH.ID = " + tech_ID + ");";
+			   			List<List<String>> see_result = esql.executeQueryAndReturnResult(check_techID); 
+						char exists = ((see_result.get(0)).get(0)).charAt(0);
+			   			if ( exists == 't') {
+			  				System.out.print("Error: The technician's ID you entered already exists. Please Try Again\n"); 
+			 	 			flag = false; 
+			   			}   
+			   			else{flag = true;}
+					}
+				}	 
+		  	}while(!flag); 
 	
-		  do{
-		  	System.out.print("Insert Technician's fullname: ");
-                  	tech_name = in.readLine();
-		        if (tech_name.length() == 0 || tech_name.length() > 128) {
-			  System.out.print("Error, you did not insert a technician's full name. Please try again\n"); 
-			  flag = false; 
-			}
- 			else {flag = true;} 
-          	  }while(!flag); 
+			System.out.print("Insert Technician's fullname: ");
+			//do while loop to check for valid length
+		  	do{
+                  		tech_name = in.readLine();
+		        	if (tech_name.length() == 0 || tech_name.length() > 128) {
+					System.out.print("Error: Invalid Input. Too many characters entered. Please try again\n");
+			  		flag = false; 
+				}
+ 				else {flag = true;} 
+          	  	}while(!flag); 
 		
-                  query4 +=  tech_ID + ", \'" + tech_name + "\');\n";
-                  System.out.print(query4);
-                  esql.executeUpdate(query4);
+                  	query4 +=  tech_ID + ", \'" + tech_name + "\');\n";
+                  	esql.executeUpdate(query4);
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
                 }
                 catch (Exception e) {
                   System.err.println(e.getMessage());
@@ -603,8 +688,26 @@ public class DBproject{
 	public static void BookFlight(DBproject esql) {//5
 		// Given a customer and a flight that he/she wants to book, add a reservation to the DB
 		try {
-			System.out.print("You have selected to Book a flight. To start, enter the Flight number you would like to book a reservation for: ");
-			String flight = in.readLine();
+			String flight, cID, fname, lname, gtype, dob, address, phone, zipcode = "";
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\nHello, you have selected to book a flight.\nTo start, enter the flight number you would like to book a reservation for: ");
+		
+			//do while loop to check for valid number
+			do {
+				flight = in.readLine();
+				if (flight.length() == 0) {
+					System.out.print("Error: Invalid Input. Please enter the flight's number\n");
+					flag = false;
+				}
+				else {
+					if (!flight.matches("\\d+")){
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+                                        else{flag = true;}
+				}	
+			} while(!flag);
+
 			String check = "SELECT  (SELECT plane.seats FROM FlightInfo Info,Plane plane WHERE Info.plane_id = plane.id AND Info.flight_id = " + flight + ") - (SELECT flight.num_sold FROM Flight flight WHERE flight.fnum = " + flight + ") AS remainin_seats;\n";
 			
 			List<List<String>>  result = esql.executeQueryAndReturnResult(check);
@@ -612,39 +715,148 @@ public class DBproject{
 			
 			//if no more seats available prompt if customer would like to be added to the waitlist 
 			if (available_seats == 0) {
-				System.out.print("There are no more seats available for flight " + flight + ". Do you want to be addded to the waitlist?(Yes | No)\n");
+				System.out.print("There are no more seats available for flight " + flight + ". Do you want to be addded to the waitlist?(Yes | No): ");
 				String  answer = in.readLine();
 				do {
 					//if customer does not want to be added to the waitlist, go back to main menu
-					if (answer.equalsIgnoreCase( "no" )) {
+					if (answer.equalsIgnoreCase( "no" ) || answer.equalsIgnoreCase("n")) {
 						break;
 					}
 					//if customer wants to be added to the waitlist, prompt for information
-					else if (answer.equalsIgnoreCase("yes")) {
-					System.out.print("Please enter the customer's id: ");
-					String cID = in.readLine();
-                                	System.out.print("Please enter the customer's first name:\n");
-                                	String fname = in.readLine();
-                                	System.out.print("Please enter the customer's last name:\n");
-                                	String lname = in.readLine();
-                                	System.out.print("Please enter the customer's gender:\n");
-                                	String gtype = in.readLine();
-                                	System.out.print("Please enter the customer's date of birth:\n");
-                                	String dob = in.readLine();
-                               		System.out.print("Please enter the customer's address:\n");
-                                	String address = in.readLine();
-                                	System.out.print("Please enter the customer's phone:\n");
-                                	String phone = in.readLine();
-                                	System.out.print("Please enter the customer's zipcode:\n");
-                                	String zipcode = in.readLine();
-                                	String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES ( NULL, " + cID + ", " + flight + ", \'W\');\n" ;
-                                	String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \' " + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n";
-					esql.executeUpdate(queryC);
-					System.out.print(queryC);
-					esql.executeUpdate(queryR);
-					System.out.print(queryR);
-					System.out.print("You have been added to the waitlist for flight " + flight + ".\n");
-					flag = true;
+					else if (answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("y")) {
+//create function---------------------------------------------------------------------------------------------------------
+						System.out.print("Please enter the customer's id: ");
+						do {
+							cID = in.readLine();
+							if (cID.length() == 0) {
+								System.out.print("Error: Invalid Input. Please enter the customer's id'\n ");
+								flag = false;
+							}
+							else{
+								if (!cID.matches("\\d+")){
+									System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+									flag = false;
+								}
+								else { 
+									/*String find_customer = "SELECT EXISTS (SELECT 1 FROM Customer c WHERE c.id = " + cID + ")";
+									List<List<String>> see_result = esql.executeQueryAndReturnResult(find_customer);
+									char exists = ((see_result.get(0)).get(0)).charAt(0);  
+			        					if (exists == 't') {
+				   						System.out.print("Obtaining customer's " + cID + " information....");
+										//flag = false;
+									} 
+									else {flag = true; }
+									*/
+									flag = true;
+								}
+							} 
+						} while (!flag);
+							
+							
+                        			System.out.print("Please enter the customer's first name: ");
+                            			do {
+                            				fname = in.readLine();
+							if (fname.length() == 0 || fname.length() > 24) {
+								System.out.print("Error: Invalid Input. Please enter the customer's name\n");
+								flag = false;
+							}
+							else{ flag = true; }                            	
+						} while(!flag);	
+							
+                            			System.out.print("Please enter the customer's last name: ");
+                            			do {
+                            				lname = in.readLine();
+							if (lname.length() == 0 || lname.length() > 24) {
+								System.out.print("Error: Invalid Input. Please enter the customer's last name\n");
+								flag = false;
+							}
+							else{ flag = true; }                            	
+						} while(!flag);		
+
+                            			System.out.print("Please enter the customer's gender ( F | M ): ");
+                            			do {
+                            				gtype = in.readLine();
+                            				if (gtype.length() == 0) {
+                            					System.out.print("Error: Invalid Input. Please enter F or M for gender type\n");
+                            					flag = false;
+							}
+							else {
+								if ( gtype.equalsIgnoreCase("F") || gtype.equalsIgnoreCase("M") ) {
+									gtype = gtype.toUpperCase();
+									flag = true;
+								}
+								else {
+									flag = false;
+									System.out.print("Error: Invalid Input. Please enter F or M for gender type\n"); 
+								}
+							}
+						} while(!flag);
+                                		
+                            			System.out.print("Please enter the customer's date of birth (YYYY-MM-DD): ");
+                            			do {
+                            				dob = in.readLine();
+                            				if (dob.length() == 0) { 
+                            					System.out.print("Error: Invalid Input. Please enter the date as YYYY-MM-DD\n");
+                            					flag = false;
+							}
+							else {
+								if( !validDate(dob) ) { flag = false;}
+								else {flag = true;}
+							}	
+						} while(!flag);
+							
+                            			System.out.print("Please enter the customer's address: ");
+                            			do {
+							address = in.readLine();
+							if( address.length() == 0 || address.length() > 256) {
+								System.out.print("Error: Invalid Input. Please enter the customers's address\n");
+			  					flag = false; 
+							}
+ 							else {flag = true;}
+                        			} while (!flag);
+                        	
+						System.out.print("Please enter the customer's phone: ");
+						do {
+							phone = in.readLine();
+							if (phone.length() == 0 || phone.length() != 10) {
+								System.out.print("Error: Invalid Input. Please enter a valid phone number (10 digits)\n");
+								flag = false;
+							}
+							else {
+								if (!phone.matches("\\d+")){
+									System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+									flag = false;
+								}
+								else { flag = true; }
+							}
+						} while (!flag);
+                            
+						System.out.print("Please enter the customer's zipcode: ");
+						do {
+                            				zipcode = in.readLine();
+                            				if (zipcode.length() == 0 || zipcode.length() > 10) {
+								System.out.print("Error: Invalid Input. Please enter a valid zipcode as ##### or #####-####\n");
+								flag = false;
+							}
+							else {
+								if ( !zipcode.matches("\\d{5}") ){
+									 if (!zipcode.matches("\\d{5}[-]\\d{4}")) {
+                                                                                System.out.print("Error: Invalid Input. Please enter a numeric value as ##### or #####-####\n");
+                                                                                flag = false;
+                                                                        }
+									else { flag = true; }
+								}
+							}
+						}while(!flag);
+//terminate function---------------------------------------------------------------------------
+                        			String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES ( NULL, " + cID + ", " + flight + ", \'W\');\n";
+                        			String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \' " + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n";
+						esql.executeUpdate(queryC);
+						esql.executeUpdate(queryR);
+						System.out.print("You have been added to the waitlist for flight " + flight + ".\n");
+						Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        			System.out.print("\n");
+						flag = true;
 					}
 					else {
 						System.out.print("Invalid input. Please try again. Enter Yes or No\n");
@@ -656,32 +868,129 @@ public class DBproject{
 			//if there are seats available, get customer's information and add to reservation and customer table
 			else {
 				System.out.print("There are seats available for flight " + flight + ".Please enter the customer's id:\n");
-				String cID = in.readLine();
-				System.out.print("Please enter the customer's first name:\n");
-				String fname = in.readLine();
-				System.out.print("Please enter the customer's last name:\n");
-				String lname = in.readLine();
-				System.out.print("Please enter the customer's gender:\n");
-                                String gtype = in.readLine();
-				System.out.print("Please enter the customer's date of birth ():\n");
-                                String dob = in.readLine();
-				System.out.print("Please enter the customer's address:\n");
-                                String address = in.readLine();
-				System.out.print("Please enter the customer's phone:\n");
-                                String phone = in.readLine();
-				System.out.print("Please enter the customer's zipcode:\n");
-                                String zipcode = in.readLine();
+				//function goes here
+				do {
+					cID = in.readLine();
+					if (cID.length() == 0) {
+						System.out.print("Error: Invalid Input. Please enter the customer's id'\n ");
+						flag = false;
+					}
+					else{
+						if (!cID.matches("\\d+")){
+							System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+							flag = false;
+						}
+						else { flag = true; }
+					} 
+				} while (!flag);
+													
+                        	System.out.print("Please enter the customer's first name: ");
+                            	do {
+                            		fname = in.readLine();
+					if (fname.length() == 0 || fname.length() > 24) {
+						System.out.print("Error: Invalid Input. Please enter the customer's name\n");
+						flag = false;
+					}
+					else{ flag = true; }                            	
+				} while(!flag);	
+							
+                          	System.out.print("Please enter the customer's last name: ");
+                            	do {
+                            		lname = in.readLine();
+					if (lname.length() == 0 || lname.length() > 24) {
+						System.out.print("Error: Invalid Input. Please enter the customer's last name\n");
+						flag = false;
+					}
+					else{ flag = true; }                            	
+				} while(!flag);		
+
+                            	System.out.print("Please enter the customer's gender ( F | M ): ");
+                            	do {
+                            		gtype = in.readLine();
+                            		if (gtype.length() == 0) {
+                            			System.out.print("Error: Invalid Input. Please enter F or M for gender type\n");
+                            			flag = false;
+					}
+					else {
+						if ( gtype.equalsIgnoreCase("F") || gtype.equalsIgnoreCase("M") ) {
+							gtype = gtype.toUpperCase();
+							flag = true;
+						}
+						else {
+							flag = false;
+							System.out.print("Error: Invalid Input. Please enter F or M for gender type\n"); 
+						}
+					}
+				} while(!flag);
+                                		
+                            	System.out.print("Please enter the customer's date of birth (YYYY-MM-DD): ");
+                            	do {
+                            		dob = in.readLine();
+                            		if (dob.length() == 0) { 
+                            			System.out.print("Error: Invalid Input. Please enter the date as YYYY-MM-DD\n");
+                            			flag = false;
+					}
+					else {
+						if( !validDate(dob) ) { flag = false;}
+						else {flag = true;}
+					}	
+				} while(!flag);
+							
+                            	System.out.print("Please enter the customer's address: ");
+                            	do {
+					address = in.readLine();
+					if( address.length() == 0 || address.length() > 256) {
+						System.out.print("Error: Invalid Input. Please enter the customers's address\n");
+			  			flag = false; 
+					}
+ 					else {flag = true;}
+                   		} while (!flag);
+                        	
+				System.out.print("Please enter the customer's phone: ");
+				do {
+					phone = in.readLine();
+					if (phone.length() == 0 || phone.length() != 10) {
+						System.out.print("Error: Invalid Input. Please enter a valid phone number (10 digits)\n");
+						flag = false;
+					}
+					else {
+						if (!phone.matches("\\d+")){
+							System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+							flag = false;
+						}
+						else { flag = true; }
+					}
+				} while (!flag);
+                            
+				System.out.print("Please enter the customer's zipcode: ");
+				do {
+                            		zipcode = in.readLine();
+                            		if (zipcode.length() == 0 || zipcode.length() > 10) {
+						System.out.print("Error: Invalid Input. Please enter a valid zipcode as ##### or #####-####\n");
+						flag = false;
+					}
+					else {
+						if ( !zipcode.matches("\\d{5}") ){
+							if (!zipcode.matches("\\d{5}[-]\\d{4}")) {
+                    						System.out.print("Error: Invalid Input. Please enter a numeric value as ##### or #####-#### regex2\n");
+            							flag = false;
+                   			     		}	
+							else { flag = true; }
+						}
+					}
+				}while(!flag);
+
+				//function terminates here
 				String queryR = "INSERT INTO Reservation (rnum, cid, fid, status) VALUES ( NULL, " + cID + ", " + flight + ",\'R\');\n" ;
 				String queryC = "INSERT INTO Customer (id, fname, lname, gtype, dob, address, phone, zipcode) VALUES (" + cID + ", \'" + fname + "\', \'" + lname + "\', \'" + gtype + "\', \'" + dob + "\', \'" + address + "\', " + phone + ", " + zipcode + ");\n"; 
 			  	List<List<String>>  my_query = esql.executeQueryAndReturnResult("SELECT f.num_sold FROM Flight f WHERE f.fnum = " + flight);
                         	int num_sold = Integer.parseInt((my_query.get(0)).get(0));	
 				String queryF = "UPDATE Flight SET num_sold = num_sold + 1 WHERE fnum = " + flight + " AND num_sold = " + Integer.toString(num_sold) + ";\n";
 				esql.executeUpdate(queryC);
-				System.out.print(queryC);
 				esql.executeUpdate(queryR);
-				System.out.print(queryR);
 				esql.executeUpdate(queryF);
-				System.out.print(queryF);
+				Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        	System.out.print("\n");
 			}
 		
 		} 
@@ -694,65 +1003,78 @@ public class DBproject{
 		// For flight number and date, find the number of availalbe seats (i.e. total plane capacity minus booked seats )
 		String flight_num, dept_date = ""; 
 		try {
-		
-		   //do while loop to find flight number 
-                   do{
-                   	System.out.print("You have selected to find number of available seats.\n To start, enter flight num: "); 
-		   	flight_num = in.readLine();
-			if (flight_num.length() == 0) {
-			   System.out.print("Error, you did not enter a flight number. Please try again\n"); 
-			   flag = false; 
-			}
-			else {flag = true;}
-                   }while(!flag); 
-	           
-		   //do-while loop to find departure date 
-		   do {
-			System.out.print("Enter departure_date in the form YYYY-MM-DD: "); 
-   		   	dept_date = in.readLine();
-		        if (dept_date.length() == 0) {
-			   System.out.print("Error, you did not enter a departure date. Please try again\n"); 
-			   flag = false; 
-			}
-			else {flag = true;}
-		   }while(!flag);   
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\nHello, you have selected to find the number of available seats for a flight.\nTo start, enter the flight's number: ");
+		   	//do while loop to find flight number 
+                  	 do{
+		   		flight_num = in.readLine();
+				if (flight_num.length() == 0) {
+			   	System.out.print("Error: Invalid Input. Please enter a flight's number\n"); 
+			  	 flag = false; 
+				}
+				else {
+					if (!flight_num.matches("\\d+") ){
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+					else {flag = true;}
+				}
+                   	}while(!flag); 
+	           	
+			System.out.print("Enter departure_date in the form YYYY-MM-DD: ");
+		  	//do-while loop to find departure date 
+		   	do { 
+   		   		dept_date = in.readLine();
+		        	if (dept_date.length() == 0) {
+			   		System.out.print("Error: Invalid Input. Please enter the date as YYYY-MM-DD\n"); 
+			   		flag = false; 
+				}
+				else {
+					if( !validDate(dept_date)) {flag = false;}
+					else {flag = true;}
+				}
+		   	}while(!flag);   
 		    
-		   
-		   String find_available_seats = "SELECT (p.seats - f.num_sold) AS Seats_Available FROM Flight f INNER JOIN Schedule s ON s.flightNum = f.fnum INNER JOIN FlightInfo FI on FI.flight_id = f.fnum INNER JOIN Plane p ON p.id = FI.plane_id WHERE f.fnum = " + flight_num + " AND f.actual_departure_date = '" + dept_date + "'";                   
-		   //int rowCount = esql.executeQueryAndPrintResult(find_seats);
-		   //System.out.println ("total row(s): " + rowCount);  
-	          
-		   //System.out.println(find_available_seats); 
-		   System.out.print("\n--------\nNumber of seats available for flight number " + flight_num + "\n"); 
-		   esql.executeQueryAndPrintResult(find_available_seats); 
-	           System.out.print("\n---------\n"); 
+		   	String find_available_seats = "SELECT (p.seats - f.num_sold) AS Seats_Available FROM Flight f INNER JOIN Schedule s ON s.flightNum = f.fnum INNER JOIN FlightInfo FI on FI.flight_id = f.fnum INNER JOIN Plane p ON p.id = FI.plane_id WHERE f.fnum = " + flight_num + " AND f.actual_departure_date = '" + dept_date + "'";                   
+		   	System.out.print("\n--------\nNumber of seats available for flight number " + flight_num + "\n"); 
+		   	esql.executeQueryAndPrintResult(find_available_seats); 
+	           	System.out.print("\n---------\n"); 
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
 		}
 		catch (Exception e) {
-		 System.err.println(e.getMessage()); 
-		}
+		 	System.err.println(e.getMessage()); 
+		}	
 	}
 
 	public static void ListsTotalNumberOfRepairsPerPlane(DBproject esql) {//7
 		// Count number of repairs per planes and list them in descending order
 		try {
-                  System.out.print("You are finding the total number of repairs per plane.\nGrabbing the information for you....\n"); 
-		  String query7 = "SELECT repairs.plane_id FROM (  SELECT repair.plane_id, COUNT(repair.plane_id) AS total_repairs FROM  Repairs repair GROUP BY repair.plane_id ORDER BY total_repairs DESC, repair.plane_id DESC) AS repairs;" ; 
-		  esql.executeQueryAndPrintResult(query7);
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+       			System.out.print("\nYou are finding the total number of repairs per plane.\nGrabbing the information for you....\n"); 
+		  	String query7 = "SELECT repairs.plane_id AS plane_id FROM (  SELECT repair.plane_id, COUNT(repair.plane_id) AS total_repairs FROM  Repairs repair GROUP BY repair.plane_id ORDER BY total_repairs DESC, repair.plane_id DESC) AS repairs;" ; 
+		  	esql.executeQueryAndPrintResult(query7);
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
+
 		}
 		catch (Exception e) {
-		 System.err.println(e.getMessage()); 
+			System.err.println(e.getMessage()); 
 		}	
 	}
 
 	public static void ListTotalNumberOfRepairsPerYear(DBproject esql) {//8
 		// Count repairs per year and list them in ascending order
 		try {
-		  System.out.print("You are finding the total number of repairs per year.\n Grabbing the information for you...\n"); 
-		  String query8 = "SELECT years.year, COUNT(repair.repair_date) AS repairs_per_year FROM (  SELECT year FROM (SELECT DISTINCT EXTRACT (year FROM \"repair_date\") AS year FROM Repairs) AS distinct_years) AS years, Repairs repair WHERE years.year = (SELECT EXTRACT (year FROM \"repair_date\")) GROUP BY (years.year) ORDER BY repairs_per_year ASC;"; 
-		  esql.executeQueryAndPrintResult(query8); 
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+			System.out.print("\nYou are finding the total number of repairs per year.\n Grabbing the information for you...\n"); 
+		  	String query8 = "SELECT years.year, COUNT(repair.repair_date) AS repairs_per_year FROM (  SELECT year FROM (SELECT DISTINCT EXTRACT (year FROM \"repair_date\") AS year FROM Repairs) AS distinct_years) AS years, Repairs repair WHERE years.year = (SELECT EXTRACT (year FROM \"repair_date\")) GROUP BY (years.year) ORDER BY repairs_per_year ASC;"; 
+		  	esql.executeQueryAndPrintResult(query8); 
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
 		}
 		catch (Exception e) {
-		 System.err.println(e.getMessage()); 
+		 	System.err.println(e.getMessage()); 
 		}
 	}
 	
@@ -764,55 +1086,66 @@ public class DBproject{
 		char convert_status;  
 		String query9; 
 		try {
-		  do {
-		      System.out.print("You are finding the number of passengers according to status. To start, please enter the flight number: ");
-		      flight_num = in.readLine();
-	              if (flight_num.length() == 0) {
-		          System.out.print("Error, you did not enter a valid flight number. Please try again!\n"); 
-		      	  flag = false; 
-		      } 	
-		      else {flag = true; }
-		   }while(!flag); 
-		  do {
-		     System.out.print("Please enter the status you would like to see, in the form(W, R, C): "); 
-		     status = in.readLine();
-                     //System.out.print("this is the status that you entered: " + status + "\n");
-		     //char variable to check status 
-		     convert_status = status.charAt(0); 
+			Stream.generate(()->"*").limit(100).forEach(System.out::print);
+			System.out.print("\nYou are finding the number of passengers according to status. To start, please enter the flight number: ");
+			do {
+		      		flight_num = in.readLine();
+	              		if (flight_num.length() == 0) {
+		        	  	System.out.print("Error, you did not enter a valid flight number. Please try again!\n"); 
+		      	  		flag = false; 
+		      		} 	
+				else {
+					if(!flight_num.matches("\\d+")) {
+						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
+						flag = false;
+					}
+					else {
+						String find_flightfnum = "SELECT EXISTS (SELECT 1 FROM Flight f WHERE f.fnum = " + flight_num + ")";
+						List<List<String>> see_result = esql.executeQueryAndReturnResult(find_flightfnum);
+						char exists = ((see_result.get(0)).get(0)).charAt(0);  
+			        		if (exists == 'f') {
+				   			System.out.print("Error: The flight number you entered does not exists. Please try again\n"); 
+				   			flag = false;
+						} 
+		      				else {flag = true; }
+					}
+				}
+		   	}while(!flag); 
+			
+			System.out.print("Please enter the status you would like to see, in the form(W, R, C): ");
+		  	do {
+		     		status = in.readLine();
+		     		convert_status = status.charAt(0); 
 
-		     if (status == "C" || status == "W" || status == "R" ){
-		        flag = true; 
-	             }
-		     //if the status is c, but user wrote the wrong input 
-		     else if (status == "Confirmed" || convert_status == 'c' || status == "confirm" || status == "confirmed") {
-		        //System.out.print("Outputting c, changing it C"); 
-                        status = "C"; 
-                        flag = true;  
-		     }
+		     		if (status == "C" || status == "W" || status == "R" ){
+		        		flag = true; 
+	             		}
+		     		//if the status is c, but user wrote the wrong input 
+		     		else if (status == "Confirmed" || convert_status == 'c' || status == "confirm" || status == "confirmed") {
+                        		status = "C"; 
+                        		flag = true;  
+		     		}
+	  	     		//if the status is w, but user wrote the wrong input 
+		     		else if (status == "Waitlist" || convert_status == 'w' || status == "waitlist" || status == "waitlisted") {
+		     			status = "W"; 
+                        		flag = true; 
+		     		}
+		     		//if the status is r, but user wrote the wrong input 
+		     		else if (status == "reserved" || convert_status == 'r' || status == "reserve" || status == "Reserved") {
+		        		status = "R"; 
+                        		flag = true; 
+		     		}
+		     		else {System.out.print("Error: Invalid Input. The status entered is invalid. Please enter W, R, or C.\n"); flag = false;}
+		  	}while(!flag);  
 
-	  	     //if the status is w, but user wrote the wrong input 
-		     else if (status == "Waitlist" || convert_status == 'w' || status == "waitlist" || status == "waitlisted") {
-		     	status = "W"; 
-                        flag = true; 
-		     }
-
-		     //if the status is r, but user wrote the wrong input 
-		     else if (status == "reserved" || convert_status == 'r' || status == "reserve" || status == "Reserved") {
-		        status = "R"; 
-                        flag = true; 
-		     }
-
-		     else {System.out.print("You entered an incorrect status. Please try again.\n"); flag = false;}
-		  }while(!flag);  
-
-		 System.out.print("......Pulling up number of Passengers in status " + status + " in flight number " + flight_num + "........\n"); 
-		 query9 = "SELECT Count(r.cid) AS Num_Passengers_for_flight From Flight f, Reservation r WHERE r.fid = " + flight_num + "AND r.fid = f.fnum AND r.status = \'" + status + "\'"; 
-		 //System.out.print(query9); 
-		 esql.executeQueryAndPrintResult(query9); 
-		  
+		 	System.out.print("......Pulling up number of Passengers with status " + status + " in flight number " + flight_num + "........\n"); 
+		 	query9 = "SELECT Count(r.cid) AS Number_of_Passengers From Flight f, Reservation r WHERE r.fid = " + flight_num + "AND r.fid = f.fnum AND r.status = \'" + status + "\'"; 
+		 	esql.executeQueryAndPrintResult(query9); 
+		  	Stream.generate(()->"*").limit(100).forEach(System.out::print);
+                        System.out.print("\n");
 		}
 		catch (Exception e) {
-		 System.err.println(e.getMessage()); 
+			System.err.println(e.getMessage()); 
 		}
 	}
 }
