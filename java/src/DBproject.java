@@ -1019,7 +1019,7 @@ public class DBproject{
 			  	 flag = false; 
 				}
 				else {
-					if (!flight_num.matches("\\d+") ){
+					if (!(flight_num.matches("\\d+")) ){
 						System.out.print("Error: Invalid Input. Please enter a numeric value\n");
 						flag = false;
 					}
@@ -1037,10 +1037,22 @@ public class DBproject{
 				}
 				else {
 					if( !validDate(dept_date)) {flag = false;}
-					else {flag = true;}
+					else {
+					//check if flight number and departure date exists 
+		        		//String flight_and_deptdate = "SELECT EXISTS (SELECT 1 FROM Flight f WHERE f.fnum = " + flight_num + "AND f.actual_deparature_date = " + dept_date + ")";
+					//int see_result = esql.executeQuery(flight_and_deptdate);
+					//char exists = ((see_result.get(0)).get(0).charAt(0));
+					//if (see_result == 1) {
+					//System.out.print("Error: The flight number and deparature date you entered doesn't exist. Please try again\n");
+					//flag = false;
+					//} 
+					//else { flag = true; }
+
+					flag = true;}
 				}
 		   	}while(!flag);   
-		    
+		   
+		         
 		   	String find_available_seats = "SELECT (p.seats - f.num_sold) AS Seats_Available FROM Flight f INNER JOIN Schedule s ON s.flightNum = f.fnum INNER JOIN FlightInfo FI on FI.flight_id = f.fnum INNER JOIN Plane p ON p.id = FI.plane_id WHERE f.fnum = " + flight_num + " AND f.actual_departure_date = '" + dept_date + "'";                   
 		   	System.out.print("\n--------\nNumber of seats available for flight number " + flight_num + "\n"); 
 		   	esql.executeQueryAndPrintResult(find_available_seats); 
